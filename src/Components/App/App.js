@@ -5,45 +5,37 @@ import ContactList from "../contactList/ContactList";
 import Filter from "../filter/Filter";
 import styles from "./App.module.css";
 
-const initialState = {
-  contacts: JSON.parse(localStorage.getItem("contacts")) || [],
-  filter: "",
-};
-
 const App = () => {
-  const [state, setState] = useState({ ...initialState });
+  const [contactList, setContactsList] = useState(
+    JSON.parse(localStorage.getItem("contacts")) || []
+  );
+  const [find, setFind] = useState("");
 
   useEffect(() => {
-    localStorage.setItem("contacts", JSON.stringify(state.contacts));
-  }, [state.contacts]);
+    localStorage.setItem("contacts", JSON.stringify(contactList));
+  }, [contactList]);
 
   const addContact = (contact) =>
-    setState((prevState) => ({
-      ...prevState,
-      contacts: [...prevState.contacts, { id: uuidv4(), ...contact }],
-    }));
+    setContactsList((prev) => [...prev, { id: uuidv4(), ...contact }]);
 
   const isThereThisContact = (name) =>
-    state.contacts.some(
+    contactList.some(
       (contact) => contact.name.toLowerCase() === name.toLowerCase()
     );
 
   const deleteContact = (e) => {
     const id = e.target.id;
-    setState((prev) => ({
-      ...prev,
-      contacts: prev.contacts.filter((contact) => contact.id !== id),
-    }));
+    setContactsList((prev) => prev.filter((contact) => contact.id !== id));
   };
 
   const addToFilterState = (e) => {
     const filter = e.target.value;
-    setState((prev) => ({ ...prev, filter: filter }));
+    setFind(filter);
   };
 
   const findContact = () =>
-    state.contacts.filter((contact) =>
-      contact.name.toLowerCase().includes(state.filter.toLowerCase())
+    contactList.filter((contact) =>
+      contact.name.toLowerCase().includes(find.toLowerCase())
     );
 
   return (
@@ -56,7 +48,7 @@ const App = () => {
         />
 
         <h2>Contacts</h2>
-        <Filter addToFilterState={addToFilterState} filter={state.filter} />
+        <Filter addToFilterState={addToFilterState} filter={find} />
         <ContactList findContact={findContact} deleteContact={deleteContact} />
       </div>
     </>
